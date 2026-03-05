@@ -1,0 +1,4 @@
+/.env
+/.vscode
+/vector_index
+/__pycache__
