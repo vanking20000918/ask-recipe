@@ -27,14 +27,20 @@
 ### 环境配置
 1. 创建虚拟环境
 使用conda创建环境
+```bash
 conda create -n ask-recipe python=3.12.7
 conda activate ask-recipe
+```
 
 2. 安装核心依赖
+```bash
 pip install -r requirements.txt
+```
 
 3. 配置API key
 在rag_modules文件夹中按照.env.example文件创建一个.env文件，配置其中包括MOONSHOT_API_KEY在内变量
 
-4. python main.py 即可打开RAG系统进行交互式问答。
-
+4. 打开RAG系统进行交互式问答。
+```bash
+python main.py 
+```
