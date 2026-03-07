@@ -352,6 +352,38 @@ class RecipeRAGSystem:
         
         print("\n感谢使用今日美食RAG系统！")
 
+    # 在 RecipeRAGSystem 类定义中添加
+    def get_answer_and_context(self, question: str):
+        """
+        专门为评估准备的函数：同时返回生成的回答和检索到的上下文文本
+        """
+        # 逻辑基本复刻 ask_question，但返回结构化数据
+        route_type = self.generation_module.query_router(question)
+        rewritten_query = self.generation_module.query_rewrite(question) if route_type != 'list' else question
+        
+        # 检索
+        filters = self._extract_filters_from_query(question)
+        if filters:
+            relevant_chunks = self.retrieval_module.metadata_filtered_search(rewritten_query, filters, top_k=self.config.top_k)
+        else:
+            relevant_chunks = self.retrieval_module.hybrid_search(rewritten_query, top_k=self.config.top_k)
+        
+        # 提取上下文文本列表
+        context_texts = [chunk.page_content for chunk in relevant_chunks]
+        
+        # 生成回答 (非流式)
+        relevant_docs = self.data_module.get_parent_documents(relevant_chunks)
+        if route_type == 'list':
+            answer = self.generation_module.generate_list_answer(question, relevant_docs)
+        elif route_type == "detail":
+            answer = self.generation_module.generate_step_by_step_answer(question, relevant_docs)
+        else:
+            answer = self.generation_module.generate_basic_answer(question, relevant_docs)
+            
+        return {
+            "answer": answer,
+            "contexts": context_texts
+        }
 
 
 def main():
